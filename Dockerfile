@@ -1,8 +1,10 @@
 FROM alpine:3.2
 
-RUN apk -U add ca-certificates python python-dev py-pip build-base && \
-    #pip update \
-    pip install locustio pyzmq && \
+ADD requirements.txt .
+
+RUN apk -U add ca-certificates python python-dev freetds-dev libxml2-dev libxslt-dev py-pip build-base && \
+    pip install --upgrade pip && \
+    pip install -r requirements.txt && \
     apk del python-dev && \
     rm -r /var/cache/apk/* && \
     mkdir /locust
@@ -10,7 +12,5 @@ RUN apk -U add ca-certificates python python-dev py-pip build-base && \
 WORKDIR /locust
 
 ADD locustfile.py /locust
-RUN test -f requirements.txt && pip install -r requirements.txt; exit 0
-
 EXPOSE 8089 5557 5558
 ENTRYPOINT [ "/usr/bin/locust" ]
